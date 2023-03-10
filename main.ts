@@ -1,3 +1,6 @@
+namespace SpriteKind {
+    export const PowerUP = SpriteKind.create()
+}
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     projectile = sprites.createProjectileFromSprite(img`
         . . . . . . . . . . . . . . . . 
@@ -19,10 +22,30 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         `, mySprite, 200, 0)
 })
 statusbars.onZero(StatusBarKind.EnemyHealth, function (status) {
-    sprites.destroy(status.spriteAttachedTo())
+    enemyDeath(status.spriteAttachedTo())
 })
 function enemyDeath (enemy: Sprite) {
-	
+    sprites.destroy(enemy, effects.disintegrate, 500)
+    if (Math.percentChance(50)) {
+        powerUp = sprites.create(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . 8 8 8 8 8 8 8 . . . . 
+            . . . . 8 7 7 7 7 7 7 7 8 . . . 
+            . . . 8 8 7 7 7 7 7 7 7 8 8 . . 
+            . . 8 8 8 7 7 8 8 8 7 7 8 8 8 . 
+            . . 8 8 8 7 7 8 8 8 7 7 8 8 8 . 
+            . . 8 8 8 7 7 8 8 8 7 7 8 8 8 . 
+            . . 8 8 8 7 7 7 7 7 7 7 8 8 8 . 
+            . . 8 8 8 7 7 7 7 7 7 7 8 8 8 . 
+            . . 8 8 8 7 7 8 8 8 8 8 8 8 8 . 
+            . . 8 8 8 7 7 8 8 8 8 8 8 8 8 . 
+            . . . 8 8 7 7 8 8 8 8 8 8 8 . . 
+            . . . . 8 8 8 8 8 8 8 8 8 . . . 
+            . . . . . 8 8 8 8 8 8 8 . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, SpriteKind.PowerUP)
+    }
 }
 sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
     sprites.destroy(sprite)
@@ -31,11 +54,12 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, oth
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
     info.changeLifeBy(-1)
-    sprites.destroy(otherSprite, effects.disintegrate, 500)
     scene.cameraShake(4, 500)
+    enemyDeath(otherSprite)
 })
 let statusbar: StatusBarSprite = null
 let enemyShip: Sprite = null
+let powerUp: Sprite = null
 let projectile: Sprite = null
 let mySprite: Sprite = null
 effects.starField.startScreenEffect()
